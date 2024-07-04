@@ -1,5 +1,3 @@
-# 202231003_Farrel-Alfared_laprak3_4
-
 ## Farrel Alfared Carasiola
 ## 202231003
 ## Pengolahan Citra Digital - A
