@@ -2,50 +2,203 @@
 ## 202231003
 ## Pengolahan Citra Digital - A
 ---
-Berikut adalah Laporan Praktikum 3 dan Praktikum 4, tentang Ekstrasi Fitur Scikit-Image RGB to HSV<br><br>
+### Laporan Praktikum 3<br>
+### Tepi dan Garis<br><br>
 ***Import Library***<br>
 ```
+import cv2 
+import numpy as np
 import matplotlib.pyplot as plt
-from skimage import io, color
-```
->Penjelasan:
-- matplotlib.pyplot as plt: Mengimpor pustaka matplotlib yang digunakan untuk membuat visualisasi data.
-- from skimage import io, color: Mengimpor modul io dan color dari pustaka skimage. Modul io digunakan untuk membaca citra, sedangkan modul color digunakan untuk konversi ruang warna.
+%matplotlib inline
 
-***Membaca citra***<br>
-```
-image = io.imread('1.jpg')
+import skimage
 ```
 > Penjelasan:
-- io.imread('1.jpg'): Membaca citra dari file '1.jpg' dan menyimpannya dalam variabel image. image akan berbentuk array numpy yang merepresentasikan citra tersebut dalam ruang warna RGB.
+- import cv2: Mengimpor pustaka OpenCV yang digunakan untuk pemrosesan citra.
+- import numpy as np: Mengimpor pustaka NumPy yang digunakan untuk operasi array.
+- import matplotlib.pyplot as plt: Mengimpor pustaka Matplotlib yang digunakan untuk membuat visualisasi data.
+- %matplotlib inline: Magic function di Jupyter Notebook yang digunakan untuk menampilkan plot secara langsung di notebook.
+- import skimage: Mengimpor pustaka scikit-image untuk pemrosesan citra, meskipun dalam kode ini tidak digunakan.
 
-***Mengubah citra dari RGB ke HSV***<br>
+***Membaca Citra***<br>
 ```
-hsv_image = color.rgb2hsv(image)
+image = cv2.imread("1.jpg")
 ```
 > Penjelasan:
-- color.rgb2hsv(image): Mengubah citra dari ruang warna RGB ke ruang warna HSV dan menyimpannya dalam variabel hsv_image. Ruang warna HSV (Hue, Saturation, Value) memisahkan informasi warna dari intensitas, yang seringkali lebih berguna untuk analisis citra.
+- cv2.imread("1.jpg"): Membaca citra dari file '1.jpg' dan menyimpannya dalam variabel image. OpenCV membaca citra dalam format BGR (Blue, Green, Red).
 
-***Menampilkan citra asli dan citra HSV***<br>
+***Mengubah Citra ke Grayscale***<br>
 ```
-fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+```
+> Penjelasan:
+- cv2.cvtColor(image, cv2.COLOR_BGR2GRAY): Mengonversi citra dari format BGR ke grayscale dan menyimpannya dalam variabel gray.
 
-ax[0].imshow(image)
-ax[0].set_title('Citra Asli')
-ax[0].axis('off')
+***Deteksi Tepi Menggunakan Canny***<br>
+```
+edges = cv2.Canny(image, 100, 150)
+```
+> Penjelasan:
+- cv2.Canny(image, 100, 150): Menerapkan algoritma deteksi tepi Canny pada citra dengan threshold nilai 100 dan 150. Hasilnya disimpan dalam variabel edges.
 
-ax[1].imshow(hsv_image)
-ax[1].set_title('Citra HSV')
-ax[1].axis('off')
+***Menampilkan Citra Asli dan Hasil Deteksi Tepi***<br>
+```
+fig, axs = plt.subplots(1, 2, figsize=(18, 10)) 
+ax = axs.ravel()
+```
+> Penjelasan:
+- fig, axs = plt.subplots(1, 2, figsize=(18, 10)): Membuat dua subplot berdampingan dalam satu figure dengan ukuran keseluruhan 18 inci x 10 inci. fig adalah objek figure yang mewakili keseluruhan plot, dan axs adalah array dari objek subplot (axes).
+- ax = axs.ravel(): Mengubah array dua dimensi axs menjadi array satu dimensi untuk mempermudah akses elemen subplot.
+```
+ax[0].imshow(gray, cmap="gray")
+ax[0].set_title("Gambar asli")
+```
+> Penjelasan:
+- ax[0].imshow(gray, cmap="gray"): Menampilkan citra grayscale pada subplot pertama dengan colormap grayscale.
+- ax[0].set_title("Gambar Original"): Mengatur judul dari subplot pertama menjadi "Gambar asli".
+```
+ax[1].imshow(edges, cmap="gray")
+ax[1].set_title("Gambar yg udah")
+```
+> Penjelasan:
+- ax[1].imshow(edges, cmap="gray"): Menampilkan hasil deteksi tepi pada subplot kedua dengan colormap grayscale.
+- ax[1].set_title("After Picture"): Mengatur judul dari subplot kedua menjadi "Gambar yg udah".
 
+***Menampilkan Plot***<br>
+```
 plt.show()
 ```
 > Penjelasan:
-- fig, ax = plt.subplots(1, 2, figsize=(12, 6)): Membuat dua subplot berdampingan dalam satu figure dengan ukuran keseluruhan 12 inci x 6 inci. fig adalah objek figure yang mewakili keseluruhan plot, dan ax adalah array dari objek subplot (axes).
-- ax[0].imshow(image): Menampilkan citra asli pada subplot pertama.
-- ax[0].set_title('Citra Asli'): Mengatur judul dari subplot pertama menjadi 'Citra Asli'.
-- ax[0].axis('off'): Mematikan tampilan sumbu pada subplot pertama sehingga sumbu x dan y tidak ditampilkan.
-- ax[1].imshow(hsv_image): Menampilkan citra yang telah dikonversi ke HSV pada subplot kedua.
-- ax[1].set_title('Citra HSV'): Mengatur judul dari subplot kedua menjadi 'Citra HSV'.
-- ax[1].axis('off'): Mematikan tampilan sumbu pada subplot kedua sehingga sumbu x dan y tidak ditampilkan.
+- plt.show(): Menampilkan figure yang telah dibuat dengan kedua subplot tersebut.<br>
+
+### Overlay
+***Deteksi Garis Menggunakan Hough Transform***<br>
+```
+lines = cv2.HoughLinesP(edges, 1, np.pi/180, 30, maxLineGap=250)
+```
+> Penjelasan:
+- cv2.HoughLinesP(edges, 1, np.pi/180, 30, maxLineGap=250): Fungsi ini digunakan untuk mendeteksi garis dalam gambar biner (dalam hal ini, hasil deteksi tepi edges). Parameter yang digunakan:
+  - edges: Gambar biner dari hasil deteksi tepi.
+  - 1: Resolusi parameter rho (jarak) dalam piksel.
+  - np.pi/180: Resolusi parameter theta (sudut) dalam radian.
+  - 30: Ambang batas minimal untuk mendeteksi sebuah garis.
+  - maxLineGap=250: Jarak maksimum antara dua titik untuk dianggap sebagai satu garis.
+- Hasilnya adalah sebuah array lines yang berisi koordinat-koordinat titik awal dan akhir dari garis-garis yang terdeteksi.
+
+***Menyalin Gambar Asli***<br>
+```
+image_line = image.copy()
+```
+> Penjelasan:
+- image.copy(): Membuat salinan dari gambar asli dan menyimpannya dalam variabel image_line.
+
+***Menggambar Garis pada Gambar***<br>
+```
+for line in lines:
+    x1, y1, x2, y2 = line[0]
+    cv2.line(image_line, (x1, y1), (x2, y2), (100, 8, 255), 1)
+```
+> Penjelasan:
+- for line in lines:: Melakukan iterasi untuk setiap garis yang terdeteksi.
+- x1, y1, x2, y2 = line[0]: Mengambil koordinat titik awal dan akhir dari garis.
+- cv2.line(image_line, (x1, y1), (x2, y2), (100, 8, 255), 1): Menggambar garis pada gambar image_line dengan warna (100, 8, 255) dan ketebalan garis 1 piksel.
+
+***Menampilkan Gambar Asli dan Gambar dengan Garis Terdeteksi***<br>
+```
+fig, axs = plt.subplots(1, 2, figsize=(10, 10))
+ax = axs.ravel()
+```
+> Penjelasan:
+- fig, axs = plt.subplots(1, 2, figsize=(10, 10)): Membuat dua subplot berdampingan dalam satu figure dengan ukuran keseluruhan 10 inci x 10 inci. fig adalah objek figure yang mewakili keseluruhan plot, dan axs adalah array dari objek subplot (axes).
+- ax = axs.ravel(): Mengubah array dua dimensi axs menjadi array satu dimensi untuk mempermudah akses elemen subplot.
+
+***Menampilkan Gambar Asli dan Gambar dengan Garis Terdeteksi***<br>
+```
+fig, axs = plt.subplots(1, 2, figsize=(10, 10))
+ax = axs.ravel()
+```
+> Penjelasan:
+- fig, axs = plt.subplots(1, 2, figsize=(10, 10)): Membuat dua subplot berdampingan dalam satu figure dengan ukuran keseluruhan 10 inci x 10 inci. fig adalah objek figure yang mewakili keseluruhan plot, dan axs adalah array dari objek subplot (axes).
+- ax = axs.ravel(): Mengubah array dua dimensi axs menjadi array satu dimensi untuk mempermudah akses elemen subplot.
+```
+ax[0].imshow(gray, cmap="gray")
+ax[0].set_title("Gambar Original")
+```
+> Penjelasan:
+- ax[0].imshow(gray, cmap="gray"): Menampilkan gambar grayscale pada subplot pertama dengan colormap grayscale.
+- ax[0].set_title("Gambar Original"): Mengatur judul dari subplot pertama menjadi "gambar asli"
+```
+ax[1].imshow(image_line, cmap="gray")
+ax[1].set_title("After Picture")
+```
+> Penjelasan:
+- ax[1].imshow(image_line, cmap="gray"): Menampilkan gambar dengan garis terdeteksi pada subplot kedua dengan colormap grayscale.
+- ax[1].set_title("gambar yg udah"): Mengatur judul dari subplot kedua menjadi "gambar yg udah".
+
+***Menampilkan Plot***<br>
+```
+plt.show()
+```
+> Penjelasan:
 - plt.show(): Menampilkan figure yang telah dibuat dengan kedua subplot tersebut.
+
+***Mengeksekusi Variabel***<br>
+```
+edges
+lines
+lines.shape
+```
+> Penjelasan:
+- edges: Menampilkan gambar hasil deteksi tepi (tidak ada output yang terlihat, mungkin di Jupyter Notebook akan menampilkan array tepi).
+- lines: Menampilkan array dari garis-garis yang terdeteksi.
+- lines.shape: Menampilkan bentuk dari array lines, yang menunjukkan jumlah garis yang terdeteksi dan dimensi dari data (biasanya (n, 1, 4), dimana n adalah jumlah garis yang terdeteksi).
+
+Hasil script
+```
+edges
+```
+array([[  0,   0,   0, ...,   0, 255,   0],
+       [  0,   0,   0, ...,   0, 255,   0],
+       [  0,   0,   0, ...,   0,   0, 255],
+       ...,
+       [  0, 255, 255, ...,   0, 255, 255],
+       [255,   0,   0, ...,   0,   0,   0],
+       [  0,   0, 255, ..., 255,   0,   0]], dtype=uint8)
+
+> Penjelasan:
+- Nilai Piksel:
+  - Nilai piksel dalam array ini adalah 0 atau 255 (dtype=uint8), di mana 0 mewakili piksel yang bukan tepi dan 255 mewakili piksel yang merupakan tepi.
+Dalam konteks deteksi tepi Canny, nilai 255 menunjukkan bahwa ada perubahan tajam dalam intensitas di sekitar piksel tersebut, yang biasanya menandakan adanya tepi atau batas antara dua area dengan intensitas yang berbeda.
+- Visualisasi:
+  - Jika array edges divisualisasikan sebagai gambar, piksel dengan nilai 255 akan muncul sebagai garis putih (tepian) pada latar belakang hitam (nilai 0), menunjukkan lokasi dari tepi-tepi dalam gambar asli.
+
+Hasil script
+```
+lines
+```
+array([[[ 567,  796,  567,   84]],
+       [[   0,  788, 1199,  767]],
+       [[   0,  298, 1183,  298]],
+       ...,
+       [[   0,  192, 1199,  192]],
+       [[ 143,  212, 1197,  212]],
+       [[   1,  191, 1198,  191]]], dtype=int32)
+       
+> Penjelasan:
+- Koordinat Garis:
+  - Setiap sub-array berisi empat nilai [x1, y1, x2, y2], yang merupakan koordinat dari dua titik akhir dari garis yang terdeteksi dalam gambar.
+  - Misalnya, sub-array pertama [[ 567, 796, 567, 84]] menunjukkan bahwa garis pertama dimulai dari titik (567, 796) dan berakhir pada titik (567, 84).
+
+Hasil script
+```
+lines.shape
+```
+(545, 1, 4)
+> Penjelasan:
+- Dimensi Array:
+  - lines.shape menghasilkan tuple (545, 1, 4).
+  - Ini berarti array lines memiliki tiga dimensi.
+- Rincian Dimensi:
+  - Dimensi pertama (545): Menunjukkan jumlah total garis yang terdeteksi. Dalam hal ini, ada 545 garis yang terdeteksi dalam gambar.
+  - Dimensi kedua (1): Ini adalah dimensi tambahan yang dihasilkan oleh fungsi OpenCV untuk menyimpan koordinat garis dalam sub-array.
+  - Dimensi ketiga (4): Menunjukkan jumlah koordinat yang dibutuhkan untuk mendefinisikan setiap garis. Setiap garis diwakili oleh empat nilai koordinat [x1, y1, x2, y2].
