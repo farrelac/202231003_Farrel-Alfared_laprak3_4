@@ -2,7 +2,7 @@
 ## 202231003
 ## Pengolahan Citra Digital - A
 ---
-Berikut adalah Laporan Praktikum 3 dan Praktikum 4, yang telah saya buat untuk Ekstrasi Fitur Scikit-Image RGB to HSV<br><br>
+Berikut adalah Laporan Praktikum 3 dan Praktikum 4, tentang Ekstrasi Fitur Scikit-Image RGB to HSV<br><br>
 ***Import Library***<br>
 import matplotlib.pyplot as plt
 from skimage import io, color<br>
