@@ -204,8 +204,8 @@ lines.shape
   - Dimensi ketiga (4): Menunjukkan jumlah koordinat yang dibutuhkan untuk mendefinisikan setiap garis. Setiap garis diwakili oleh empat nilai koordinat [x1, y1, x2, y2].
 
 ---
-### Laporan Praktikum 3<br>
-### Tepi dan Garis<br><br>
+### Laporan Praktikum 4<br>
+### Ekstraksi Fitur  Menggunakan skimage (scikit-image) RGB to HSV<br><br>
 ***Import library***<br>
 ```
 import cv2
@@ -260,3 +260,115 @@ plt.show()
 - ax[1].imshow(img_hsv): Menampilkan gambar dalam ruang warna HSV pada subplot kedua.
 - ax[1].set_title("HSV"): Memberi judul "HSV" pada subplot kedua.
 plt.show(): Menampilkan kedua subplot tersebut.
+
+***Menghitung Rata-Rata***<br>
+```
+mean = np.mean(img_hsv.ravel())
+```
+> Penjelasan:
+- img_gray.ravel(): Mengubah array 2D dari gambar grayscale (img_gray) menjadi array 1D (vektor). Ini dilakukan untuk mempermudah perhitungan statistik.
+- np.mean(...): Menghitung nilai rata-rata (mean) dari elemen-elemen dalam array 1D yang dihasilkan dari ravel(). Nilai mean ini merupakan rata-rata intensitas piksel dari gambar grayscale.
+
+***Menghitung Standar Deviasi (Standard Deviation)***<br>
+```
+std = np.std(img_hsv.ravel())
+```
+> Penjelasan:
+- img_gray.ravel(): Sama seperti sebelumnya, mengubah array 2D dari gambar grayscale menjadi array 1D.
+- np.std(...): Menghitung nilai standar deviasi dari elemen-elemen dalam array 1D. Standar deviasi ini menunjukkan seberapa besar variasi atau penyebaran intensitas piksel di sekitar nilai mean.
+
+***Mencetak Nilai Mean dan Standar Deviasi***<br>
+```
+print(mean, std)
+```
+> Penjelasan:
+- print(mean, std): Mencetak nilai mean dan standar deviasi yang telah dihitung ke layar.
+
+Hasil script
+```
+mean = np.mean(img_hsv.ravel())
+std = np.std(img_hsv.ravel())
+
+print(mean, std)
+```
+56.950442219440966 58.50973261678556
+
+> Penjelasan:
+- Nilai rata-rata (mean) menggambarkan intensitas piksel rata-rata dalam gambar grayscale. Dalam kasus ini, nilai rata-rata adalah 56.950442219440966.
+- Standar deviasi (std) menggambarkan seberapa banyak variasi atau penyebaran intensitas piksel di sekitar nilai rata-rata. Dalam kasus ini, nilai standar deviasi adalah 58.50973261678556.
+- Interpretasi Hasil
+  - Mean (56.95):
+    - Nilai rata-rata dari intensitas piksel dalam gambar adalah sekitar 56.95. Ini menunjukkan bahwa, secara umum, gambar tersebut cenderung memiliki intensitas piksel yang rendah, karena nilai intensitas berkisar dari 0 hingga 255 (dalam citra grayscale).
+  - Standard Deviation (58.51):
+    - Standar deviasi sekitar 58.51 menunjukkan bahwa ada variasi yang signifikan dalam intensitas piksel di seluruh gambar. Nilai standar deviasi yang tinggi berarti intensitas piksel tersebar luas di sekitar nilai rata-rata, menunjukkan adanya kontras atau perbedaan yang kuat antara area terang dan gelap dalam gambar.
+
+***Gray level Co-occurrence Matrix (GLCM)***<br>
+```
+glcm = graycomatrix(img_v, distances=[1], angles=[0], levels=256, symmetric=True, normed=True)
+```
+> Penjelasan:
+- graycomatrix Function:
+  - Kode ini menghitung Gray Level Co-occurrence Matrix (GLCM) untuk gambar img_v. GLCM adalah matriks yang digunakan untuk menganalisis tekstur dengan mengukur seberapa sering pasangan piksel dengan nilai intensitas tertentu muncul pada jarak dan orientasi tertentu.
+- Parameter Function:
+  - img_v: Gambar input yang diproses. Gambar ini seharusnya dalam format grayscale, di mana nilai intensitas piksel berkisar antara 0 hingga 255.
+  - distances=[1]: Jarak antara pasangan piksel yang dihitung. Dalam hal ini, jarak yang digunakan adalah 1 piksel.
+  - angles=[0]: Sudut orientasi pasangan piksel yang dihitung. Dalam hal ini, sudut yang digunakan adalah 0 derajat (horizontal).
+  - levels=256: Jumlah level intensitas piksel yang dipertimbangkan dalam gambar. Karena gambar adalah grayscale dengan nilai intensitas antara 0 hingga 255, jumlah level adalah 256.
+  - symmetric=True: Jika True, maka GLCM akan dihitung secara simetris, yang berarti nilai (i, j) akan sama dengan (j, i). Ini berguna untuk mengurangi redundansi dalam matriks.
+  - normed=True: Jika True, maka GLCM akan dinormalkan sehingga jumlah seluruh elemen dalam matriks sama dengan 1. Ini memungkinkan perbandingan matriks GLCM dari gambar yang berbeda.
+- Hasil:
+  - glcm: Hasil dari fungsi graycomatrix, yang merupakan matriks 4D di mana dua dimensi pertama adalah ukuran matriks GLCM, dimensi ketiga adalah untuk berbagai jarak yang digunakan, dan dimensi keempat adalah untuk berbagai sudut yang digunakan. Dalam kasus ini, hasil akan berupa matriks 256x256x1x1 karena kita menggunakan satu jarak dan satu sudut.
+
+***Properti Tekstur Yang Dihitung dari GLCM***<br>
+```
+contrast = graycoprops(glcm, 'contrast')[0, 0]
+dissimilarity = graycoprops(glcm, 'dissimilarity')[0, 0]
+homogeneity = graycoprops(glcm, 'homogeneity')[0, 0]
+energy = graycoprops(glcm, 'energy')[0, 0]
+correlation = graycoprops(glcm, 'correlation')[0, 0]
+ASM = graycoprops(glcm, 'ASM')[0, 0]
+
+print(f"Contrast: {contrast}")
+print(f"Dissimilarity: {dissimilarity}")
+print(f"Homogeneity: {homogeneity}")
+print(f"Energy: {energy}")
+print(f"Correlation: {correlation}")
+print(f"ASM: {ASM}")
+```
+> Penjelasan:
+- graycoprops Function:
+  - graycoprops adalah fungsi dari pustaka skimage.feature yang digunakan untuk menghitung properti tekstur dari GLCM.
+- Properti Tekstur yang Dihitung:
+  - Contrast: Mengukur intensitas kontras lokal dalam gambar. Nilai kontras yang tinggi menunjukkan variasi yang besar dalam intensitas piksel.
+  - Dissimilarity: Mengukur seberapa banyak intensitas piksel berbeda satu sama lain. Nilai dissimilarity yang tinggi menunjukkan perbedaan intensitas yang besar.
+  - Homogeneity: Mengukur kedekatan distribusi elemen GLCM ke diagonal GLCM. Nilai homogenitas yang tinggi menunjukkan tekstur yang lebih seragam.
+  - Energy: Mengukur kekompakan teksur dan distribusi energi dalam GLCM. Nilai energi yang tinggi menunjukkan tekstur yang lebih seragam dan teratur.
+  - Correlation: Mengukur korelasi antara pasangan piksel dalam GLCM. Nilai korelasi yang tinggi menunjukkan hubungan linier yang kuat antara piksel.
+  - ASM (Angular Second Moment): Mengukur homogenitas dari gambar. ASM adalah kuadrat dari energi, sehingga memberikan informasi yang serupa dengan energi.
+- Mengakses Nilai Properti:
+  - Setiap properti dihitung dengan graycoprops(glcm, property_name), yang mengembalikan array 2D di mana kita hanya memerlukan nilai pertama [0, 0].
+- Menampilkan Hasil:
+  - Hasil dari setiap properti dicetak menggunakan print dengan format string untuk menampilkan nilai properti tersebut dengan label yang sesuai.
+
+Hasil output script di atas menunjukkan sebagai berikut:<br>
+Contrast: 344.20057390336757<br>
+Dissimilarity: 8.840892650425209<br>
+Homogeneity: 0.24140231347678798<br>
+Energy: 0.020296884602945084<br>
+Correlation: 0.9260076737518064<br>
+ASM: 0.00041196352458526927<br>
+
+> Penjelasan:
+- Contrast: 344.20057390336757
+  - Mengukur intensitas kontras dalam gambar. Nilai yang lebih tinggi menunjukkan kontras yang lebih besar dan perbedaan yang lebih tajam antara nilai piksel.
+- Dissimilarity: 8.840892650425209
+  - Mengukur seberapa berbeda pasangan piksel. Semakin tinggi nilai disimilari, semakin berbeda pasangan piksel.
+- Homogeneity: 0.24140231347678798
+  - Mengukur kedekatan distribusi elemen dalam GLCM ke diagonal matriks. Nilai yang lebih tinggi menunjukkan gambar yang lebih homogen.
+- Energy: 0.020296884602945084
+  - Mengukur keseragaman dalam GLCM. Ini adalah akar kuadrat dari jumlah kuadrat elemen dalam GLCM. Nilai yang lebih tinggi menunjukkan tekstur yang lebih seragam.
+- Correlation: 0.9260076737518064
+  - Mengukur korelasi antara pasangan piksel dalam GLCM. Nilai yang lebih tinggi menunjukkan bahwa piksel memiliki hubungan linier yang kuat.
+- ASM: 0.00041196352458526927
+  - Mengukur kekompakan dalam distribusi elemen GLCM. Ini adalah jumlah kuadrat dari elemen dalam GLCM. Nilai yang lebih tinggi menunjukkan tekstur yang lebih halus dan seragam.
+
