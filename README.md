@@ -202,3 +202,61 @@ lines.shape
   - Dimensi pertama (545): Menunjukkan jumlah total garis yang terdeteksi. Dalam hal ini, ada 545 garis yang terdeteksi dalam gambar.
   - Dimensi kedua (1): Ini adalah dimensi tambahan yang dihasilkan oleh fungsi OpenCV untuk menyimpan koordinat garis dalam sub-array.
   - Dimensi ketiga (4): Menunjukkan jumlah koordinat yang dibutuhkan untuk mendefinisikan setiap garis. Setiap garis diwakili oleh empat nilai koordinat [x1, y1, x2, y2].
+
+---
+### Laporan Praktikum 3<br>
+### Tepi dan Garis<br><br>
+***Import library***<br>
+```
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np 
+import skimage
+from skimage.feature import graycomatrix, graycoprops
+```
+> Penjelasan:
+- Pada bagian ini, beberapa pustaka yang diperlukan diimpor. cv2 adalah pustaka OpenCV yang digunakan untuk pemrosesan gambar. matplotlib.pyplot digunakan untuk plotting gambar. numpy digunakan untuk operasi numerik. skimage adalah pustaka dari scikit-image yang digunakan untuk pengolahan gambar.
+
+***Membaca Gambar***<br>
+```
+img = cv2.imread("1.jpg")
+```
+> Penjelasan:
+- Gambar dengan nama 1.jpg dibaca menggunakan OpenCV dan disimpan dalam variabel img.
+
+***Konversi Gambar dari RGB ke HSV***<br>
+```
+img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+```
+> Penjelasan:
+- Gambar yang telah dibaca dikonversi dari ruang warna RGB ke ruang warna HSV menggunakan fungsi cv2.cvtColor.
+
+***Ekstraksi Kanal V dari Gambar HSV***<br>
+```
+img_v = img_hsv[:, :, 2]
+```
+> Penjelasan:
+- Kanal V (Value) dari gambar HSV diekstraksi dan disimpan dalam variabel img_v. HSV adalah ruang warna yang terdiri dari Hue, Saturation, dan Value. Kanal V menunjukkan intensitas atau kecerahan gambar.
+
+***Plot Gambar RGB dan HSV***<br>
+```
+fig, axs = plt.subplots(1, 2, figsize=(15, 10))
+
+ax = axs.ravel()
+
+ax[0].imshow(img)
+ax[0].set_title("RGB")
+
+ax[1].imshow(img_hsv)
+ax[1].set_title("HSV")
+
+plt.show()
+```
+> Penjelasan:
+- fig, axs = plt.subplots(1, 2, figsize=(15, 10)): Membuat dua subplot dalam satu baris dengan ukuran keseluruhan 15x10 inci.
+- ax = axs.ravel(): Mengubah array 2D axs menjadi array 1D untuk mempermudah akses.
+- ax[0].imshow(img): Menampilkan gambar asli (RGB) pada subplot pertama.
+- ax[0].set_title("RGB"): Memberi judul "RGB" pada subplot pertama.
+- ax[1].imshow(img_hsv): Menampilkan gambar dalam ruang warna HSV pada subplot kedua.
+- ax[1].set_title("HSV"): Memberi judul "HSV" pada subplot kedua.
+plt.show(): Menampilkan kedua subplot tersebut.
