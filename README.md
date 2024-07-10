@@ -41,7 +41,7 @@ edges = cv2.Canny(image, 100, 150)
 > Penjelasan:
 - cv2.Canny(image, 100, 150): Menerapkan algoritma deteksi tepi Canny pada citra dengan threshold nilai 100 dan 150. Hasilnya disimpan dalam variabel edges.
 
-***Menampilkan Citra Asli dan Hasil Deteksi Tepi***<br>
+**Menampilkan Citra Asli dan Hasil Deteksi Tepi**<br>
 ```
 fig, axs = plt.subplots(1, 2, figsize=(18, 10)) 
 ax = axs.ravel()
